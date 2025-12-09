@@ -17,9 +17,13 @@ class CarFeatures(BaseModel):
     engine_cc: float
     max_power_bhp: float
     torque_nm: float
-    seats: int
+    seats: float
 
 @router.post('/predict')
-def predict_car_price(car: CarFeatures, user = Depends(get_current_user), _=Depends(get_api_key)):
+def predict_price(car: CarFeatures, user = Depends(get_current_user), _=Depends(get_api_key)):
     prediction = predict_car_price(car.model_dump())
-    return {'Predicted price': f'{prediction:,.3f}'}
+    if prediction is None:
+        raise ValueError("Prediction failed: model returned None")
+    return {'Predicted price': f'{float(prediction):,.3f}'}
+
+
